@@ -13,14 +13,6 @@ const petriNetInitializer = new PetriNetInitializer()
 const testQualityUseCase = new TestQualityUseCase(petriNetInitializer.getPetriNet())
 
 export class TestQualityController implements ITestQualityController {
-  private petriNetInitializer: PetriNetInitializer
-  private testQualityUseCase: TestQualityUseCase
-
-  constructor() {
-    this.petriNetInitializer = new PetriNetInitializer()
-    this.testQualityUseCase = new TestQualityUseCase(this.petriNetInitializer.getPetriNet())
-  }
-
   public checkProductQuality(req: Request, res: Response) {
     const body: RequestBody = {
       product: {
@@ -32,7 +24,7 @@ export class TestQualityController implements ITestQualityController {
     }
 
     try {
-      const result = this.testQualityUseCase.checkProductQuality(body.product)
+      const result = testQualityUseCase.checkProductQuality(body.product)
 
       return res.status(200).send({ is: result })
     } catch (error) {

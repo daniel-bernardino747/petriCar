@@ -1,30 +1,25 @@
+import { ProductRepository } from '@/src/domain/repositories/products.repositories'
+import { ProductServices } from '@/src/domain/services/products.services'
 import { Request, Response } from 'express'
 import { PetriNetInitializer } from '../usecases/petriNetInitializer'
-import { Product, TestQualityUseCase } from '../usecases/testQualityUseCase'
-
-interface RequestBody {
-  product: Product
-}
+import { TestQualityUseCase } from '../usecases/testQualityUseCase'
 
 interface ITestQualityController {
-  checkProductQuality(req: Request, res: Response): Response
+  checkProductQuality(req: Request, res: Response): Promise<Response>
 }
+
 const petriNetInitializer = new PetriNetInitializer()
-const testQualityUseCase = new TestQualityUseCase(petriNetInitializer.getPetriNet())
+const testQualityUseCase = new TestQualityUseCase(
+  petriNetInitializer.getPetriNet(),
+)
+const productsRepo = new ProductRepository()
+const productsService = new ProductServices(productsRepo)
 
 export class TestQualityController implements ITestQualityController {
-  public checkProductQuality(req: Request, res: Response) {
-    const body: RequestBody = {
-      product: {
-        name: 'abc',
-        weight: 9000,
-        height: 212,
-        length: 122,
-      },
-    }
-
+  public async checkProductQuality(req: Request, res: Response) {
     try {
-      const result = testQualityUseCase.checkProductQuality(body.product)
+      const product = await productsService.getRandomProduct()
+      const result = testQualityUseCase.checkProductQuality(product)
 
       return res.status(200).send({ is: result })
     } catch (error) {

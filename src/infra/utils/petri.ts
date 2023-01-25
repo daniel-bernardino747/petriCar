@@ -12,13 +12,13 @@ interface IPetriTransition {
 export interface IProductQualityPetri {
   transitions: IPetriTransition[]
   places: Place[]
-  markings: Map<Place, number>
+  markings: Map<string, number>
 }
 
 export class ProductQualityPetri implements IProductQualityPetri {
   transitions: IPetriTransition[]
   places: Place[]
-  markings: Map<Place, number>
+  markings: Map<string, number>
 
   constructor() {
     this.transitions = []
@@ -26,23 +26,45 @@ export class ProductQualityPetri implements IProductQualityPetri {
     this.markings = new Map()
   }
 
+  addToken(place: Place) {
+    const newPlaces = this.places.map((p) => {
+      if (p.name === place.name) {
+        p.tokens++
+      }
+      return p
+    })
+    this.places = newPlaces
+    this.markings.set(place.name, place.tokens)
+  }
+
+  removeToken(place: Place) {
+    const newPlaces = this.places.map((p) => {
+      if (p.name === place.name) {
+        p.tokens--
+      }
+      return p
+    })
+    this.places = newPlaces
+    this.markings.set(place.name, place.tokens)
+  }
+
   addPlace(place: Place) {
     this.places.push(place)
-    this.markings.set(place, 0)
+    this.markings.set(place.name, 0)
   }
 
   addTransition(transition: IPetriTransition) {
     this.transitions.push(transition)
   }
 
-  setInitialMarking(place: Place, tokens: number) {
-    this.markings.set(place, tokens)
+  setInitialMarking(name: string, tokens: number) {
+    this.markings.set(name, tokens)
   }
 
   isEnableTransition(transition: IPetriTransition) {
     let enabled = true
     for (const inputPlace of transition.inputPlaces) {
-      const placeMarking = this.markings.get(inputPlace)
+      const placeMarking = this.markings.get(inputPlace.name)
       if (!placeMarking || placeMarking < (inputPlace.tokens || 0)) {
         enabled = false
         break
@@ -54,32 +76,12 @@ export class ProductQualityPetri implements IProductQualityPetri {
   fireTransition(transition: IPetriTransition) {
     this.showConsoleBefore(transition)
 
-    if (!this.isEnableTransition(transition)) {
-      throw new Error('Transition is not enabled')
-    }
+    if (!this.isEnableTransition(transition)) throw new Error('Transition is not enabled')
 
-    for (const inputPlace of transition.inputPlaces) {
-      this.markings.set(inputPlace, (this.markings.get(inputPlace) ?? 0) - inputPlace.tokens)
-    }
-    for (const outputPlace of transition.outputPlaces) {
-      this.markings.set(outputPlace, (this.markings.get(outputPlace) ?? 0) + transition.inputPlaces[0].tokens)
-    }
+    for (const inputPlace of transition.inputPlaces) this.removeToken(inputPlace)
+    for (const outputPlace of transition.outputPlaces) this.addToken(outputPlace)
 
-    let updatedInputPlaces = [...transition.inputPlaces]
-    let updatedOutputPlaces = [...transition.outputPlaces]
-
-    updatedInputPlaces = updatedInputPlaces.map((place) => {
-      return { ...place, tokens: this.markings.get(transition.inputPlaces[0]) ?? 0 }
-    })
-
-    updatedOutputPlaces = updatedOutputPlaces.map((place) => {
-      return { ...place, tokens: this.markings.get(transition.outputPlaces[0]) ?? 0 }
-    })
-
-    const updatedTransition = { ...transition, inputPlaces: updatedInputPlaces, outputPlaces: updatedOutputPlaces }
-    this.changeToken(updatedTransition)
-
-    this.showConsoleAfter()
+    this.showConsoleAfter(transition)
   }
 
   changeToken(transition: IPetriTransition) {
@@ -92,8 +94,8 @@ export class ProductQualityPetri implements IProductQualityPetri {
     console.log('markings (before): ', this.markings)
   }
 
-  showConsoleAfter() {
-    console.log('transation in progress (after): ', this.transitions[0])
+  showConsoleAfter(transition: IPetriTransition) {
+    console.log('transation in progress (after): ', transition)
     console.log('markings (after): ', this.markings)
     console.log('=============================================================')
   }

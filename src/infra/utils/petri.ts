@@ -76,16 +76,21 @@ export class ProductQualityPetri implements IProductQualityPetri {
   fireTransition(transition: IPetriTransition) {
     this.showConsoleBefore(transition)
 
-    if (!this.isEnableTransition(transition)) throw new Error('Transition is not enabled')
+    if (!this.isEnableTransition(transition))
+      throw new Error('Transition is not enabled')
 
-    for (const inputPlace of transition.inputPlaces) this.removeToken(inputPlace)
-    for (const outputPlace of transition.outputPlaces) this.addToken(outputPlace)
+    for (const inputPlace of transition.inputPlaces)
+      this.removeToken(inputPlace)
+    for (const outputPlace of transition.outputPlaces)
+      this.addToken(outputPlace)
 
     this.showConsoleAfter(transition)
   }
 
   changeToken(transition: IPetriTransition) {
-    this.transitions = this.transitions.filter((t) => t.name !== transition.name)
+    this.transitions = this.transitions.filter(
+      (t) => t.name !== transition.name,
+    )
     this.transitions.push(transition)
   }
 

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,4 +5,68 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Place {
+  id           Int            @id @default(autoincrement())
+  tokens       Int            @default(0)
+  name         String
+  imputPlaces  ImputPlaces[]
+  outputPlaces OutputPlaces[]
+
+  @@map("places")
+}
+
+model Transition {
+  id           Int            @id @default(autoincrement())
+  name         String
+  imputPlaces  ImputPlaces[]
+  outputPlaces OutputPlaces[]
+
+  @@map("transitions")
+}
+
+model ImputPlaces {
+  transitionId Int        @map("transition_id")
+  placeId      Int        @map("place_id")
+  place        Place      @relation(fields: [placeId], references: [id])
+  transition   Transition @relation(fields: [transitionId], references: [id])
+
+  @@id([placeId, transitionId])
+  @@map("imput_places")
+}
+
+model OutputPlaces {
+  transitionId Int        @map("transition_id")
+  placeId      Int        @map("place_id")
+  place        Place      @relation(fields: [placeId], references: [id])
+  transition   Transition @relation(fields: [transitionId], references: [id])
+
+  @@id([placeId, transitionId])
+  @@map("output_places")
+}
+
+model Product {
+  id               Int      @id @default(autoincrement())
+  name             String
+  brand            String
+  model            String
+  type             String
+  engine           String
+  power            String
+  topSpeed         String   @map("top_speed")
+  traction         String
+  navigationSystem String   @map("navigation_system")
+  airConditioning  AirType  @map("air_conditioning")
+  safety           String[]
+  offroad          String[]
+  warranty         String
+  weight           String
+  connectivity     String[]
+  passed           Boolean
+}
+
+enum AirType {
+  Manual
+  Automatic
 }

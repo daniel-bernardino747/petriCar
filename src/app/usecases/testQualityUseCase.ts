@@ -15,7 +15,7 @@ export class TestQualityUseCase {
   }
 
   public checkProductQuality(product: Product): boolean {
-    const [tTest, tFail, tRedo, tProductCheck] = this.petriNet.transitions
+    const [tTest, tFail, tRedo, tProductCheck, tRemadeProduct] = this.petriNet.transitions
 
     this.petriNet.fireTransition(tTest)
 
@@ -26,10 +26,12 @@ export class TestQualityUseCase {
     } else {
       this.petriNet.fireTransition(tFail)
 
-      if (product.name.includes('.')) return false
-      product.name = product.name + ' .'
-
       this.petriNet.fireTransition(tRedo)
+
+      this.fixQualityProduct(product)
+
+      this.petriNet.fireTransition(tRemadeProduct)
+
       return this.checkProductQuality(product)
     }
   }
@@ -42,5 +44,11 @@ export class TestQualityUseCase {
     const isPassed = validWeight && validHeight && validLenght
 
     return isPassed ? true : false
+  }
+
+  private fixQualityProduct(product: Product): void {
+    product.weight = 9999
+    product.height = 211
+    product.length = 122
   }
 }

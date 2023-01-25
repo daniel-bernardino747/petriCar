@@ -6,7 +6,11 @@
   "scripts": {
     "start:dev": "nodemon --watch 'src/' --exec 'ts-node -r tsconfig-paths/register src/server.ts' -e ts",
     "husky": "husky install",
-    "build": "tsc && tsc-alias"
+    "build": "tsc && tsc-alias",
+    "prisma:seed": "npx prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "eslintConfig": {
     "extends": [

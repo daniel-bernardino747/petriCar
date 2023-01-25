@@ -14,7 +14,7 @@ export class PetriNetInitializer {
   private initializePetriNet() {
     const places = new Map<string, Place>()
 
-    places.set('pProduct', { name: 'product', tokens: 1 })
+    places.set('pProduct', { name: 'product', tokens: 0 })
     places.set('pQuality', { name: 'quality', tokens: 0 })
     places.set('pFail', { name: 'fail', tokens: 0 })
     places.set('pRedo', { name: 'redo', tokens: 0 })
@@ -22,8 +22,9 @@ export class PetriNetInitializer {
 
     places.forEach((place) => {
       this.petriNet.addPlace(place)
-      this.petriNet.setInitialMarking(place, place.tokens)
+      this.petriNet.setInitialMarking(place.name, place.tokens)
     })
+    this.petriNet.addToken(places.get('pProduct') as Place)
 
     const [pProduct, pQuality, pFail, pRedo, pFinished] = Array.from(places.values())
 

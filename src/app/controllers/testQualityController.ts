@@ -1,40 +1,54 @@
-import { ProductRepository } from '@/src/domain/repositories/products.repositories'
-import { ProductServices } from '@/src/domain/services/products.services'
 import { Request, Response } from 'express'
-import { PetriNetInitializer } from '../usecases/petriNetInitializer'
-import { TestQualityUseCase } from '../usecases/testQualityUseCase'
 
-export class TestQualityController implements ts.ITestQualityController {
-  petriNetInitializer: ts.IPetriNetInitializer
-  productQualityPetri: ts.IProductQualityPetri
-  testQualityUseCase: ts.ITestQualityUseCase
-  productsService: ts.IProductServices
-  qualityServices: ts.IQualityServices
-  productsRepo: ts.IProductRepository
+import {
+  IPetriNetInitializer,
+  ITestQualityUseCase,
+  PetriNetInitializer,
+  TestQualityUseCase,
+} from '@/usecases'
+import {
+  IProductServices,
+  IQualityServices,
+  ProductServices,
+  QualityServices,
+} from '@/services'
+import { IProductRepository, ProductRepository } from '@/repositories'
+import { IProductQualityPetri, ProductQualityPetri } from '@/petri'
+
+import httpStatus from 'http-status'
+
+export class TestQualityController implements ITestQualityController {
+  petriNetInitializer: IPetriNetInitializer
+  productQualityPetri: IProductQualityPetri
+  testQualityUseCase: ITestQualityUseCase
+  productsService: IProductServices
+  qualityServices: IQualityServices
+  productsRepo: IProductRepository
 
   constructor() {
-    this.productQualityPetri = new ts.ProductQualityPetri()
-    this.petriNetInitializer = new ts.PetriNetInitializer(
-      this.productQualityPetri,
-    )
-    this.productsRepo = new ts.ProductRepository()
-    this.productsService = new ts.ProductServices(this.productsRepo)
-    this.qualityServices = new ts.QualityServices()
-    this.testQualityUseCase = new ts.TestQualityUseCase(
+    this.productQualityPetri = new ProductQualityPetri()
+    this.petriNetInitializer = new PetriNetInitializer(this.productQualityPetri)
+    this.productsRepo = new ProductRepository()
+    this.productsService = new ProductServices(this.productsRepo)
+    this.qualityServices = new QualityServices()
+    this.testQualityUseCase = new TestQualityUseCase(
       this.petriNetInitializer.getPetriNet(),
       this.qualityServices,
     )
   }
 
-export class TestQualityController implements ITestQualityController {
-  public async checkProductQuality(req: Request, res: Response) {
+  public checkProductQuality = async (_req: Request, res: Response) => {
     try {
-      const product = await productsService.getRandomProduct()
-      const result = testQualityUseCase.checkProductQuality(product)
+      const product = await this.productsService.getRandomProduct()
+      const result = this.testQualityUseCase.checkProductQuality(product)
 
-      return res.status(200).send({ is: result })
+      return res.status(httpStatus.OK).send({ is: result })
     } catch (error) {
-      return res.status(500).send(error)
+      console.error(error)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error)
     }
   }
+}
+export interface ITestQualityController {
+  checkProductQuality(req: Request, res: Response): Promise<Response>
 }

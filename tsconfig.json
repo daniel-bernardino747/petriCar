@@ -11,7 +11,14 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["*"],
+      "@/repositories": ["./src/domain/repositories"],
+      "@/services": ["./src/domain/services"],
+      "@/controllers": ["./src/app/controllers"],
+      "@/usecases": ["./src/app/usecases"],
+      "@/errors": ["./src/errors"],
+      "@/petri": ["./src/infra/utils/petri.ts"],
+      "@/prisma": ["./src/prisma/prisma.client"]
     },
     "baseUrl": "."
   }

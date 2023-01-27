@@ -38,15 +38,10 @@ export class TestQualityController implements ITestQualityController {
   }
 
   public checkProductQuality = async (_req: Request, res: Response) => {
-    try {
-      const product = await this.productsService.getRandomProduct()
-      const result = this.testQualityUseCase.checkProductQuality(product)
+    const product = await this.productsService.getRandomProduct()
+    const result = this.testQualityUseCase.checkProductQuality(product)
 
-      return res.status(httpStatus.OK).send({ is: result })
-    } catch (error) {
-      console.error(error)
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error)
-    }
+    return res.status(httpStatus.OK).send({ is: result })
   }
 }
 export interface ITestQualityController {

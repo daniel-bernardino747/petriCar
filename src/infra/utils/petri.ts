@@ -67,8 +67,7 @@ export class ProductQualityPetri implements IProductQualityPetri {
   public fireTransition(transition: IPetriTransition): void {
     this.showConsoleBefore(transition)
 
-    if (!this.isEnableTransition(transition))
-      throw new NotEnableError('Transition is not enabled')
+    if (!this.isEnableTransition(transition)) throw new NotEnableError()
 
     for (const inputPlace of transition.inputPlaces)
       this.removeToken(inputPlace)

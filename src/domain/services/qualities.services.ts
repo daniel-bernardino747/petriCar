@@ -15,17 +15,22 @@ export class QualityServices implements IQualityServices {
   private fixEngine(product: Product): Product {
     const correctEngine = '4 cylinders'
 
-    product.engine = correctEngine
+    if (this.repairEfficienty()) product.engine = correctEngine
 
     return product
   }
   private fixSafety(product: Product): Product {
     const safetyParts = ['Airbags', 'Stability system']
 
-    safetyParts.forEach((part) => {
-      if (!product.safety.includes(part)) product.safety.push(part)
-    })
+    if (this.repairEfficienty()) {
+      safetyParts.forEach((part) => {
+        if (!product.safety.includes(part)) product.safety.push(part)
+      })
+    }
     return product
+  }
+  private repairEfficienty(): boolean {
+    return Math.random() < 0.7
   }
   public fullReview(product: Product): IFullReview {
     const safety = this.verifySafety(product)

@@ -1,9 +1,5 @@
 import { Product } from '@prisma/client'
-import { IProductRepository } from '../repositories/products.repositories'
-
-export interface IProductServices {
-  getRandomProduct(): Promise<Product>
-}
+import { IProductRepository } from '@/repositories'
 
 export class ProductServices implements IProductServices {
   private readonly productsRepo
@@ -25,4 +21,8 @@ export class ProductServices implements IProductServices {
 
     return randomProduct
   }
+}
+
+export interface IProductServices {
+  getRandomProduct(): Promise<Product>
 }

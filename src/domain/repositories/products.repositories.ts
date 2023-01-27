@@ -1,5 +1,5 @@
-import { prisma } from '@/src/prisma/prisma.client'
 import { Product } from '@prisma/client'
+import { prisma } from '@/prisma'
 
 export interface IProductRepository {
   findAllQuality(): Promise<Product[]>
@@ -7,17 +7,18 @@ export interface IProductRepository {
 }
 
 export class ProductRepository implements IProductRepository {
-  public async findAllQuality() {
-    return await prisma.product.findMany({
-      where: {
-        passed: true,
-      },
-    })
-  }
   public async findAllPoorQuality() {
     return await prisma.product.findMany({
       where: {
         passed: false,
+      },
+    })
+  }
+
+  public async findAllQuality() {
+    return await prisma.product.findMany({
+      where: {
+        passed: true,
       },
     })
   }

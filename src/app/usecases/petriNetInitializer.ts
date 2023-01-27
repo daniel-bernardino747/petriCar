@@ -1,18 +1,14 @@
-import { Place, ProductQualityPetri } from '../../infra/utils/petri'
+import { IProductQualityPetri, IPlace } from '@/petri'
 
-export interface IPetriNetInitializer {
-  getPetriNet(): ProductQualityPetri
-}
+export class PetriNetInitializer implements IPetriNetInitializer {
+  private petriNet: IProductQualityPetri
 
-export class PetriNetInitializer {
-  private petriNet: ProductQualityPetri
-
-  constructor() {
-    this.petriNet = new ProductQualityPetri()
+  constructor(petriNet: IProductQualityPetri) {
+    this.petriNet = petriNet
     this.initializePetriNet()
   }
   private initializePetriNet() {
-    const places = new Map<string, Place>()
+    const places = new Map<string, IPlace>()
 
     places.set('pProduct', { name: 'product', tokens: 0 })
     places.set('pQuality', { name: 'quality', tokens: 0 })
@@ -57,8 +53,11 @@ export class PetriNetInitializer {
       this.petriNet.addTransition(transition)
     })
   }
-
-  public getPetriNet(): ProductQualityPetri {
+  public getPetriNet(): IProductQualityPetri {
     return this.petriNet
   }
+}
+
+export interface IPetriNetInitializer {
+  getPetriNet(): IProductQualityPetri
 }

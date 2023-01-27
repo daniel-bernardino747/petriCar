@@ -1,14 +1,32 @@
-import { QualityServices } from '@/src/domain/services/qualities.services'
-import { ProductQualityPetri } from '@/src/infra/utils/petri'
 import { Product } from '@prisma/client'
+import { IQualityServices } from '@/services'
+import { IProductQualityPetri } from '@/petri'
 
-export class TestQualityUseCase {
-  private petriNet: ProductQualityPetri
-  private qualityServices: QualityServices
+export class TestQualityUseCase implements ITestQualityUseCase {
+  private petriNet: IProductQualityPetri
+  private qualityServices: IQualityServices
 
-  constructor(petriNet: ProductQualityPetri) {
+  constructor(
+    petriNet: IProductQualityPetri,
+    qualityServices: IQualityServices,
+  ) {
     this.petriNet = petriNet
-    this.qualityServices = new QualityServices()
+    this.qualityServices = qualityServices
+  }
+
+  private fixQualityProduct(product: Product): void {
+    this.qualityServices.reviewAndFix(product)
+  }
+
+  private performQualityCheck(product: Product): boolean {
+    const resultTests = this.qualityServices.fullReview(product)
+
+    if (resultTests.passed) return true
+    return false
+  }
+
+  private startTest(): void {
+    this.petriNet.addToken({ name: 'product', tokens: 1 })
   }
 
   public checkProductQuality(product: Product): boolean {
@@ -33,19 +51,7 @@ export class TestQualityUseCase {
 
     return this.checkProductQuality(product)
   }
-
-  private performQualityCheck(product: Product): boolean {
-    const resultTests = this.qualityServices.fullReview(product)
-
-    if (resultTests.passed) return true
-    return false
-  }
-
-  private fixQualityProduct(product: Product): void {
-    this.qualityServices.reviewAndFix(product)
-  }
-
-  private startTest(): void {
-    this.petriNet.addToken({ name: 'product', tokens: 1 })
-  }
+}
+export interface ITestQualityUseCase {
+  checkProductQuality(product: Product): boolean
 }

@@ -51,6 +51,12 @@ code .
 
 ---
 
+Rode o seed do Prisma
+
+```bash
+npm run prisma:seed
+```
+
 Execute a aplicação em modo de desenvolvimento
 
 ```bash
@@ -69,51 +75,90 @@ Na rota descrita você pode alterar os valores do body e ver os resultados difer
 
 ### O produto
 
-Abaixo está descrito a respectiva propriedade os valores aceitos para que seja um produto de qualidae:
+Abaixo está descrito a respectiva propriedade os valores aceitos para que o produto passe no teste:
 
 - **Peso** _(weight)_ : entre os valores **7000 e 10000 mililitros**
 - **Altura** _(height)_: entre os valores **210 e 218 milimetros**
 - **Comprimento** _(length)_ : entre os valores **119 e 128 milimetros**
 
 ```javascript
-src / app / controllers / testQualityController.ts / 'linha 27-34'
+src / app / controllers / testQualityController.ts
 
-const body: RequestBody = {
-  product: {
-    name: 'abc',
-    weight: 9000,
-    height: 212,
-    length: 122,
-  },
+product: {
+  name: 'Car',
+  brand: 'Ford',
+  model: 'Escape',
+  type: 'SUV',
+  engine: '4 cylinders',
+  power: '250 HP',
+  topSpeed: '190 km/h',
+  traction: '4WD',
+  navigationSystem: 'GPS',
+  airConditioning: 'Automatic',
+  safety: ['ABS brakes', 'Airbags', 'Stability system'],
+  offroad: ['4x4 mode', 'Locking differential system'],
+  warranty: '3 years',
+  weight: '2.045 kg',
+  connectivity: ['Bluetooth', 'Wi-Fi', 'Apple CarPlay'],
+  passed: true,
 }
-
 // return {is: true}
 
-const body: RequestBody = {
-  product: {
-    name: 'abc',
-    weight: 19000,
-    height: 300,
-    length: 100,
-  },
-}
-
+product: {
+  name: 'Car',
+  brand: 'Ford',
+  model: 'Escape',
+  type: 'SUV',
+  engine: '3 cylinders',
+  power: '250 HP',
+  topSpeed: '190 km/h',
+  traction: '4WD',
+  navigationSystem: 'GPS',
+  airConditioning: 'Automatic',
+  safety: ['ABS brakes', 'Stability system'],
+  offroad: ['4x4 mode', 'Locking differential system'],
+  warranty: '3 years',
+  weight: '2.045 kg',
+  connectivity: ['Bluetooth', 'Wi-Fi', 'Apple CarPlay'],
+  passed: false,
+},
 // return {is: false}
 ```
 
-### Observação:
+### Teste:
 
-Mesmo retornando o valor **false**, ainda sim significa que houve uma tentativa de refazer o produto descrito em:
+Usando a rota `/start`, o retorno será um objeto com a propriedade `is: true` ou `is: false`, indicando se é produto passou ou não no teste de qualidade.
+
+Além disso, visualizando pelo terminal, conseguirá ver o antes e o depois da transição e as marcações dos lugares na rede de petri, conforme for adicionando produtos, a marcação em `finished` aumentará.
 
 ```javascript
-src / app / usecases / testQualityUseCase.ts / 'linha 30-37'
-
-this.petriNet.fireTransition(tFail)
-
-if (product.name.includes('.')) return false
-product.name = product.name + ' .'
-
-// Retestar o produto
-this.petriNet.fireTransition(tRedo)
-return this.checkProductQuality(product)
+// transation in progress (before):
+{
+  name: 'Testing',
+  inputPlaces: [ { name: 'product', tokens: 1 } ],
+  outputPlaces: [ { name: 'quality', tokens: 0 } ]
+}
+// markings (before):  Map(5)
+{
+  'product' => 1,
+  'quality' => 0,
+  'fail' => 0,
+  'redo' => 0,
+  'finished' => 1
+}
+// transation in progress (after):
+{
+  name: 'Testing',
+  inputPlaces: [ { name: 'product', tokens: 0 } ],
+  outputPlaces: [ { name: 'quality', tokens: 1 } ]
+}
+// markings (after):  Map(5)
+{
+  'product' => 0,
+  'quality' => 1,
+  'fail' => 0,
+  'redo' => 0,
+  'finished' => 1
+}
+=============================================================
 ```
